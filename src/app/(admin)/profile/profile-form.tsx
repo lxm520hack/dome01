@@ -17,10 +17,12 @@ import { saveProfile, changePassword } from "@/app/actions/profile"
 export function ProfileForm({
   username,
   email,
+  role = "user",
   initialTab = "profile",
 }: {
   username: string
   email: string
+  role?: "admin" | "user"
   initialTab?: "profile" | "password"
 }) {
   const [name, setName] = useState(username)
@@ -76,7 +78,9 @@ export function ProfileForm({
                 </Avatar>
                 <div className="grid gap-1 text-sm">
                   <span className="font-medium">{name}</span>
-                  <span className="text-muted-foreground">管理员账号</span>
+                  <span className="text-muted-foreground">
+                    {role === "admin" ? "管理员账号" : "普通用户账号"}
+                  </span>
                 </div>
               </div>
               <Separator />

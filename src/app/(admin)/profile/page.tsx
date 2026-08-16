@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { getSession } from "@/lib/session"
-import { getAdminProfile } from "@/lib/admin-store"
+import { findUserById } from "@/lib/user-store"
 import { ProfileForm } from "@/app/(admin)/profile/profile-form"
 
 export const metadata = {
@@ -16,13 +16,16 @@ export default async function ProfilePage({
   const session = await getSession()
   if (!session) redirect("/login")
 
-  const profile = await getAdminProfile()
+  const user = await findUserById(session.userId)
+  if (!user) redirect("/login")
+
   const { tab } = await searchParams
 
   return (
     <ProfileForm
-      username={profile.username}
-      email={profile.email}
+      username={user.username}
+      email={user.email}
+      role={user.role}
       initialTab={tab === "password" ? "password" : "profile"}
     />
   )

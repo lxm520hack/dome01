@@ -36,6 +36,7 @@ dev-server.log
 
 # runtime data
 /data/admin.json
+/data/users.json
 
 # vercel
 .vercel

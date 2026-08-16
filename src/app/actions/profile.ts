@@ -4,10 +4,10 @@ import { revalidatePath } from "next/cache"
 
 import { getSession } from "@/lib/session"
 import {
-  getAdminProfile,
-  updateAdminProfile,
-  updateAdminPassword,
-} from "@/lib/admin-store"
+  findUserById,
+  updateUserProfile,
+  updateUserPassword,
+} from "@/lib/user-store"
 
 export type ProfileState = { ok?: boolean; error?: string } | undefined
 
@@ -21,11 +21,7 @@ export async function saveProfile(prevState: ProfileState, formData: FormData) {
   if (!username) return { error: "用户名不能为空" }
   if (!email) return { error: "邮箱不能为空" }
 
-  await updateAdminProfile({
-    username,
-    email,
-    avatar: null,
-  })
+  await updateUserProfile(session.userId, { username, email })
 
   revalidatePath("/profile")
   return { ok: true }
@@ -46,12 +42,12 @@ export async function changePassword(
     return { error: "两次输入的新密码不一致" }
   }
 
-  const result = await updateAdminPassword(current, next)
+  const result = await updateUserPassword(session.userId, current, next)
   return { error: result.error ?? undefined, ok: result.ok }
 }
 
 export async function getProfileForPage() {
   const session = await getSession()
   if (!session) return null
-  return getAdminProfile()
+  return findUserById(session.userId)
 }

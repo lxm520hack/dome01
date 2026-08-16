@@ -2,6 +2,7 @@
 
 import { useActionState } from "react"
 import { Store } from "lucide-react"
+import Link from "next/link"
 
 import { login } from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
@@ -54,7 +55,7 @@ export function LoginForm({ from }: { from?: string }) {
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="admin123"
+                  placeholder="请输入密码"
                   autoComplete="current-password"
                   required
                 />
@@ -77,6 +78,24 @@ export function LoginForm({ from }: { from?: string }) {
                 {pending ? "登录中..." : "登录"}
               </Button>
             </form>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              还没有账号？{" "}
+              <Link
+                href="/register"
+                className="font-medium text-primary hover:underline"
+              >
+                立即注册
+              </Link>
+            </p>
+            <p className="mt-2 text-center text-sm text-muted-foreground">
+              管理员？{" "}
+              <Link
+                href="/register-admin"
+                className="font-medium text-primary hover:underline"
+              >
+                注册管理员账号
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -9,6 +9,7 @@ export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname
   const isProtected = protectedRoutes.includes(path)
   const isLoginPage = path === "/login"
+  const isRegisterPage = path === "/register" || path === "/register-admin"
 
   const cookie = req.cookies.get("session")?.value
   const session = cookie ? await decrypt(cookie) : null
@@ -19,7 +20,7 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (isLoginPage && session) {
+  if ((isLoginPage || isRegisterPage) && session) {
     return NextResponse.redirect(new URL("/", req.nextUrl))
   }
 
