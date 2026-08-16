@@ -20,6 +20,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -414,15 +415,16 @@ export default function ProductsPage() {
                             }
                           />
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>操作</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => openEdit(product)}>
-                              <Pencil className="size-4" />
-                              编辑
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => toggleStatus(product)}>
-                              {product.status === "on_sale" ? "下架" : "上架"}
-                            </DropdownMenuItem>
+                            <DropdownMenuGroup>
+                              <DropdownMenuLabel>操作</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => openEdit(product)}>
+                                <Pencil className="size-4" />
+                                编辑
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toggleStatus(product)}>
+                                {product.status === "on_sale" ? "下架" : "上架"}
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               variant="destructive"

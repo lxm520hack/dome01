@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server"
 
 import { decrypt } from "@/lib/session-token"
 
-const protectedRoutes = ["/", "/products", "/orders", "/users", "/categories", "/settings"]
+const protectedRoutes = ["/", "/products", "/orders", "/users", "/categories", "/settings", "/profile"]
 
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname

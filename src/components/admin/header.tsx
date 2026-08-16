@@ -1,4 +1,5 @@
 import { Bell, Search } from "lucide-react"
+import Link from "next/link"
 
 import { logout } from "@/app/actions/auth"
 import { getSession } from "@/lib/session"
@@ -9,6 +10,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -46,10 +48,21 @@ export async function Header() {
             }
           />
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>我的账号</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>个人资料</DropdownMenuItem>
-            <DropdownMenuItem>修改密码</DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>我的账号</DropdownMenuLabel>
+              <DropdownMenuItem
+                render={<Link href="/profile" />}
+                className="cursor-pointer"
+              >
+                个人资料
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                render={<Link href="/profile?tab=password" />}
+                className="cursor-pointer"
+              >
+                修改密码
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <form action={logout}>
               <button

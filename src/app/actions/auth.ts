@@ -3,9 +3,7 @@
 import { redirect } from "next/navigation"
 
 import { createSession, deleteSession } from "@/lib/session"
-
-const ADMIN_USERNAME = "admin"
-const ADMIN_PASSWORD = "admin123"
+import { verifyAdminPassword } from "@/lib/admin-store"
 
 export type LoginState = { error?: string } | undefined
 
@@ -15,7 +13,12 @@ export async function login(prevState: LoginState, formData: FormData) {
   const from = formData.get("from")
   const remember = formData.get("remember") === "on"
 
-  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+  const { ok, record } = await verifyAdminPassword(
+    String(username ?? ""),
+    String(password ?? "")
+  )
+
+  if (!ok || username !== record.username) {
     return {
       error: "用户名或密码错误",
     }
@@ -24,7 +27,7 @@ export async function login(prevState: LoginState, formData: FormData) {
   await createSession(
     {
       userId: "u-admin",
-      username: "admin",
+      username: record.username,
       role: "admin",
     },
     remember

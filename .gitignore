@@ -34,6 +34,9 @@ dev-server.log
 # env files (can opt-in for committing if needed)
 .env*
 
+# runtime data
+/data/admin.json
+
 # vercel
 .vercel
 
