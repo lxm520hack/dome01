@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Plus, Search, Pencil, Trash2, MoreHorizontal } from "lucide-react"
+import { useState } from "react"
+import { Plus, Search, Pencil, Trash2, MoreHorizontal, Download } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -54,6 +54,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { PaginationBar } from "@/components/admin/pagination-bar"
 
+import { exportCsv } from "@/lib/csv"
 import { products as initialProducts, productStatusMap } from "@/lib/data"
 import type { Product } from "@/lib/data"
 
@@ -105,14 +106,29 @@ export default function ProductsPage() {
   const allPageSelected =
     pageItems.length > 0 && pageItems.every((p) => selected.has(p.id))
 
-  useEffect(() => {
-    setPage(1)
-  }, [search, statusFilter])
-
   function openCreate() {
     setEditing(null)
     setForm(emptyForm)
     setDialogOpen(true)
+  }
+
+  function exportProducts() {
+    exportCsv(
+      `商品列表_${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        ["名称", "分类", "价格", "库存", "销量", "状态", "SKU", "创建时间"],
+        ...filtered.map((p) => [
+          p.name,
+          p.category,
+          p.price,
+          p.stock,
+          p.sales,
+          productStatusMap[p.status].label,
+          p.sku,
+          p.createdAt,
+        ]),
+      ]
+    )
   }
 
   function openEdit(product: Product) {
@@ -251,10 +267,16 @@ export default function ProductsPage() {
             共 {items.length} 个商品，在售 {items.filter((p) => p.status === "on_sale").length} 个
           </p>
         </div>
-        <Button onClick={openCreate}>
-          <Plus />
-          新增商品
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={exportProducts}>
+            <Download />
+            导出 CSV
+          </Button>
+          <Button onClick={openCreate}>
+            <Plus />
+            新增商品
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -264,12 +286,18 @@ export default function ProductsPage() {
             placeholder="搜索商品名称或 SKU..."
             className="pl-8"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
         <Select
           value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v ?? "all")}
+          onValueChange={(v) => {
+            setStatusFilter(v ?? "all")
+            setPage(1)
+          }}
         >
           <SelectTrigger className="w-full sm:w-36">
             <SelectValue placeholder="全部状态" />

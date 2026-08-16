@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Search, ShieldCheck, ShieldX, Ban } from "lucide-react"
+import { useState } from "react"
+import { Search, ShieldCheck, ShieldX, Ban, Download } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import { PaginationBar } from "@/components/admin/pagination-bar"
 
+import { exportCsv } from "@/lib/csv"
 import { users as initialUsers } from "@/lib/data"
 import type { User } from "@/lib/data"
 
@@ -72,10 +73,6 @@ export default function UsersPage() {
   const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
   const allPageSelected =
     pageItems.length > 0 && pageItems.every((u) => selected.has(u.id))
-
-  useEffect(() => {
-    setPage(1)
-  }, [search, statusFilter])
 
   function toggleAllPage() {
     setSelected((prev) => {
@@ -118,6 +115,25 @@ export default function UsersPage() {
     setSelected(new Set())
   }
 
+  function exportUsers() {
+    exportCsv(
+      `用户列表_${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        ["用户名", "邮箱", "手机号", "角色", "订单数", "累计消费", "状态", "注册时间"],
+        ...filtered.map((u) => [
+          u.name,
+          u.email,
+          u.phone,
+          roleMap[u.role].label,
+          u.orders,
+          u.totalSpent,
+          statusMap[u.status].label,
+          u.joinedAt,
+        ]),
+      ]
+    )
+  }
+
   function toggleBan(user: User) {
     const banned = user.status !== "banned"
     setItems((prev) =>
@@ -135,11 +151,17 @@ export default function UsersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">用户管理</h1>
-        <p className="text-sm text-muted-foreground">
-          共 {items.length} 位用户，正常 {items.filter((u) => u.status === "active").length} 位
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">用户管理</h1>
+          <p className="text-sm text-muted-foreground">
+            共 {items.length} 位用户，正常 {items.filter((u) => u.status === "active").length} 位
+          </p>
+        </div>
+        <Button variant="outline" onClick={exportUsers}>
+          <Download />
+          导出 CSV
+        </Button>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -149,12 +171,18 @@ export default function UsersPage() {
             placeholder="搜索用户名、邮箱、手机号..."
             className="pl-8"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
         <Select
           value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v ?? "all")}
+          onValueChange={(v) => {
+            setStatusFilter(v ?? "all")
+            setPage(1)
+          }}
         >
           <SelectTrigger className="w-full sm:w-36">
             <SelectValue />

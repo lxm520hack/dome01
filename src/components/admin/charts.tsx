@@ -1,5 +1,7 @@
 "use client"
 
+import { BarChart3, PieChart as PieChartIcon, TrendingUp } from "lucide-react"
+
 import {
   Bar,
   BarChart,
@@ -18,6 +20,17 @@ import {
 
 import { formatCurrency } from "@/lib/data"
 
+function EmptyChart({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="flex h-[260px] flex-col items-center justify-center gap-3 text-muted-foreground">
+      <div className="flex size-12 items-center justify-center rounded-full bg-muted/50">
+        {icon}
+      </div>
+      <p className="text-sm">{label}</p>
+    </div>
+  )
+}
+
 interface TrendDatum {
   day: string
   revenue: number
@@ -25,6 +38,9 @@ interface TrendDatum {
 }
 
 export function RevenueTrendChart({ data }: { data: TrendDatum[] }) {
+  if (data.length === 0) {
+    return <EmptyChart icon={<BarChart3 className="size-5" />} label="暂无营收数据" />
+  }
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={data} barGap={8}>
@@ -63,6 +79,9 @@ export function RevenueTrendChart({ data }: { data: TrendDatum[] }) {
 }
 
 export function OrderTrendChart({ data }: { data: TrendDatum[] }) {
+  if (data.length === 0) {
+    return <EmptyChart icon={<TrendingUp className="size-5" />} label="暂无订单趋势数据" />
+  }
   return (
     <ResponsiveContainer width="100%" height={260}>
       <LineChart data={data}>
@@ -117,6 +136,16 @@ interface ShareDatum {
 }
 
 export function CategoryShareChart({ data }: { data: ShareDatum[] }) {
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[200px] flex-col items-center justify-center gap-3 text-muted-foreground">
+        <div className="flex size-12 items-center justify-center rounded-full bg-muted/50">
+          <PieChartIcon className="size-5" />
+        </div>
+        <p className="text-sm">暂无分类占比数据</p>
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col items-center gap-4">
       <ResponsiveContainer width="100%" height={200}>

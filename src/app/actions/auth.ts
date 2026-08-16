@@ -13,6 +13,7 @@ export async function login(prevState: LoginState, formData: FormData) {
   const username = formData.get("username")
   const password = formData.get("password")
   const from = formData.get("from")
+  const remember = formData.get("remember") === "on"
 
   if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
     return {
@@ -20,11 +21,14 @@ export async function login(prevState: LoginState, formData: FormData) {
     }
   }
 
-  await createSession({
-    userId: "u-admin",
-    username: "admin",
-    role: "admin",
-  })
+  await createSession(
+    {
+      userId: "u-admin",
+      username: "admin",
+      role: "admin",
+    },
+    remember
+  )
 
   const target =
     typeof from === "string" &&

@@ -7,6 +7,7 @@ import { login } from "@/app/actions/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Card,
   CardContent,
@@ -61,6 +62,17 @@ export function LoginForm({ from }: { from?: string }) {
               {state?.error && (
                 <p className="text-sm text-destructive">{state.error}</p>
               )}
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="remember"
+                  name="remember"
+                  value="on"
+                  defaultChecked
+                />
+                <Label htmlFor="remember" className="text-sm font-normal">
+                  记住我（30 天内免登录）
+                </Label>
+              </div>
               <Button type="submit" className="w-full" disabled={pending}>
                 {pending ? "登录中..." : "登录"}
               </Button>

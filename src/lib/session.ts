@@ -2,12 +2,16 @@ import { cookies } from "next/headers"
 
 import { encrypt, decrypt, type SessionPayload } from "@/lib/session-token"
 
-export async function createSession(payload: {
-  userId: string
-  username: string
-  role: string
-}) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+export async function createSession(
+  payload: {
+    userId: string
+    username: string
+    role: string
+  },
+  remember = false
+) {
+  const maxAgeDays = remember ? 30 : 1
+  const expiresAt = new Date(Date.now() + maxAgeDays * 24 * 60 * 60 * 1000)
   const session = await encrypt({
     ...payload,
     expiresAt,

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Search, Eye, Truck, CheckCheck, X } from "lucide-react"
+import { useState } from "react"
+import { Search, Eye, Truck, CheckCheck, X, Download } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -35,6 +35,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { PaginationBar } from "@/components/admin/pagination-bar"
 
+import { exportCsv } from "@/lib/csv"
 import { orders as initialOrders, orderStatusMap } from "@/lib/data"
 import type { Order } from "@/lib/data"
 
@@ -72,10 +73,6 @@ export default function OrdersPage() {
   const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
   const allPageSelected =
     pageItems.length > 0 && pageItems.every((o) => selected.has(o.id))
-
-  useEffect(() => {
-    setPage(1)
-  }, [search, statusFilter])
 
   function toggleAllPage() {
     setSelected((prev) => {
@@ -138,6 +135,25 @@ export default function OrdersPage() {
     setSelected(new Set())
   }
 
+  function exportOrders() {
+    exportCsv(
+      `订单列表_${new Date().toISOString().slice(0, 10)}.csv`,
+      [
+        ["订单号", "客户", "手机号", "商品", "金额", "状态", "支付方式", "下单时间"],
+        ...filtered.map((o) => [
+          o.orderNo,
+          o.customer,
+          o.customerPhone,
+          o.items.map((i) => `${i.name} x${i.quantity}`).join("；"),
+          o.total,
+          orderStatusMap[o.status].label,
+          o.paymentMethod,
+          o.createdAt,
+        ]),
+      ]
+    )
+  }
+
   function updateStatus(id: string, status: Order["status"]) {
     setItems((prev) =>
       prev.map((o) => (o.id === id ? { ...o, status } : o))
@@ -148,9 +164,15 @@ export default function OrdersPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">订单管理</h1>
-        <p className="text-sm text-muted-foreground">共 {items.length} 条订单</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">订单管理</h1>
+          <p className="text-sm text-muted-foreground">共 {items.length} 条订单</p>
+        </div>
+        <Button variant="outline" onClick={exportOrders}>
+          <Download />
+          导出 CSV
+        </Button>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -160,12 +182,18 @@ export default function OrdersPage() {
             placeholder="搜索订单号、客户..."
             className="pl-8"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
           />
         </div>
         <Select
           value={statusFilter}
-          onValueChange={(v) => setStatusFilter(v ?? "all")}
+          onValueChange={(v) => {
+            setStatusFilter(v ?? "all")
+            setPage(1)
+          }}
         >
           <SelectTrigger className="w-full sm:w-36">
             <SelectValue />
